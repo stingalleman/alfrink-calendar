@@ -1,6 +1,7 @@
 # alfrink-calendar
 
-Webscraper for [Alfrink calendar](https://www.alfrink.nl/agenda)
+Webscraper for the [Alfrink calendar](https://www.alfrink.nl/agenda)
 
 ------
-[License](https://github.com/stingalleman/alfrink-calendar/blob/master/LICENSE)
+## License
+[GNU General Public License v3.0](https://github.com/stingalleman/alfrink-calendar/blob/master/LICENSE)
