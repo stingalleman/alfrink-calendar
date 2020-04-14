@@ -1,2 +1,6 @@
 # alfrink-calendar
-Puppeteer web scraper for the calendar on https://alfrink.nl
+
+Webscraper for [Alfrink calendar](https://www.alfrink.nl/agenda)
+
+------
+[License](https://github.com/stingalleman/alfrink-calendar/blob/master/LICENSE)

@@ -1,0 +1,28 @@
+{
+  "name": "alfrink-calendar",
+  "version": "0.0.1",
+  "description": "Webscraper for https://www.alfrink.nl/agenda",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stingalleman/alfrink-calendar.git"
+  },
+  "keywords": [
+    "calendar",
+    "webscraper",
+    "puppeteer",
+    "node"
+  ],
+  "author": "Sting Alleman",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/stingalleman/alfrink-calendar/issues"
+  },
+  "homepage": "https://github.com/stingalleman/alfrink-calendar#readme",
+  "dependencies": {
+    "puppeteer": "^2.1.1"
+  }
+}
