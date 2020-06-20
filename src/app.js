@@ -4,13 +4,14 @@ const moment = require("moment");
 const ical = require("ical-generator");
 const cron = require("node-cron");
 
-const cal = ical({ domain: "alleman.tech", name: "Alfrink iCal" });
+// prettier-ignore
+const cal = ical({ domain: "http://alleman.tech", name: "Alfrink iCal", url: "http://alleman.tech/alfrink", ttl: 60 * 60 * 24, timezone: "Europe/Amsterdam" });
 moment.locale("nl");
 
 const app = express();
 const calData = {};
 
-async function init() {
+cron.schedule("0 1 * * *", async function () {
 	try {
 		const browser = await puppeteer.launch({
 			headless: true,
@@ -44,9 +45,16 @@ async function init() {
 				data[i] = data[i].replace(/(\r\n|\n|\r)/gm, " + ");
 				calData[i] = {
 					// prettier-ignore
-					date: `${moment().year(dateData[1]).format("YYYY")}-${moment().month(dateData[0]).format("MM")}-${moment().day(i + 1).format("DD")}T10:10:10`,
+					date: `${moment().year(dateData[1]).format("YYYY")}-${moment().month(dateData[0]).format("MM")}-${moment().date(i + 1).format("DD")}T10:10:10`,
 					info: data[i],
 				};
+				cal.createEvent({
+					// prettier-ignore
+					start: `${moment().year(dateData[1]).format("YYYY")}-${moment().month(dateData[0]).format("MM")}-${moment().date(i + 1).format("DD")}T10:10:10`,
+					summary: data[i],
+					location: "Alfrink College",
+					allDay: true,
+				});
 				console.log("push!");
 			}
 		}
@@ -54,9 +62,8 @@ async function init() {
 		return calData;
 	} catch (err) {
 		console.log("error: " + err);
-		process.exit();
 	}
-}
+});
 
 app.get("/", function (req, res) {
 	res.send("/alfrink of /alfrink/data");
@@ -71,5 +78,3 @@ app.get("/alfrink/data", function (req, res) {
 });
 
 app.listen("1223", () => console.log("http://localhost:1223"));
-
-init();
