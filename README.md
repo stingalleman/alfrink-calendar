@@ -9,7 +9,7 @@ git clone https://github.com/stingalleman/alfrink-calendar
 cd alfrink-calendar
 npm install
 
-node app.js # Run the code
+node src/index.js # Run the code
 ```
 
 _____
