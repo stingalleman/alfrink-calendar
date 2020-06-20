@@ -11,10 +11,11 @@ moment.locale("nl");
 const app = express();
 const calData = {};
 
-cron.schedule("33 1 * * *", async function () {
+cron.schedule("36 1 * * *", async function () {
 	try {
 		const browser = await puppeteer.launch({
 			headless: true,
+			args: ["--no-sandbox"],
 		});
 		const page = await browser.newPage();
 		await page.goto("https://www.alfrink.nl/agenda", {
