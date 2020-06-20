@@ -5,12 +5,13 @@ const express = require("express");
 // const cron = require("node-cron");
 
 const app = express();
-const calData = [];
+const calData = {};
 
 async function init() {
 	try {
 		const browser = await puppeteer.launch({
-			headless: true,
+			headless: false,
+			slowMo: 500,
 		});
 		const page = await browser.newPage();
 		await page.goto("https://www.alfrink.nl/agenda", {
@@ -18,16 +19,27 @@ async function init() {
 		});
 		const data = await page.$$eval("table tr td", (tds) =>
 			tds.map((td) => {
-				return td.innerText;
+				if (td.className == "is-disabled") {
+					return;
+				} else {
+					console.log(td);
+					return td.innerText;
+				}
 			})
 		);
 		let i;
 		for (i = 0; i < data.length; i++) {
-			if (/^[0-9]*$/.test(data[i]) == false) {
-				calData.push(data[i]);
-				console.log(data[i]);
+			if (data[i] == undefined) {
+				console.log("nothing");
+			} else if (/^[0-9]*$/.test(data[i]) == false) {
+				data[i] = data[i].slice(3);
+				data[i] = data[i].replace(/(\r\n|\n|\r)/gm, " + ");
+				calData[i] = {
+					day: i + 1,
+					info: data[i],
+				};
+				console.log("push!");
 			}
-			// console.log(/^[0-9]*$/.test(data[i]));
 		}
 		await browser.close();
 		return calData;
@@ -37,8 +49,8 @@ async function init() {
 	}
 }
 
-app.get("/", function (req, res) {
-	res.send(calData);
+app.get("alfrink/data", function (req, res) {
+	res.json(calData);
 });
 
 app.listen("1223", () => console.log("http://localhost:1223"));
