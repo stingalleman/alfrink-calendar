@@ -43,7 +43,7 @@ cron.schedule("36 1 * * *", async function () {
 				console.log("undefined");
 			} else if (/^[0-9]*$/.test(data[i]) == false) {
 				data[i] = data[i].slice(3);
-				data[i] = data[i].replace(/(\r\n|\n|\r)/gm, " + ");
+				data[i] = data[i].replace(/(\r\n|\n|\r)/gm, " +++ ");
 				calData[i] = {
 					// prettier-ignore
 					date: `${moment().year(dateData[1]).format("YYYY")}-${moment().month(dateData[0]).format("MM")}-${moment().date(i + 1).format("DD")}T10:10:10`,
