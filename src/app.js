@@ -11,7 +11,7 @@ moment.locale("nl");
 const app = express();
 const calData = {};
 
-cron.schedule("0 1 * * *", async function () {
+cron.schedule("33 1 * * *", async function () {
 	try {
 		const browser = await puppeteer.launch({
 			headless: true,
