@@ -38,7 +38,7 @@ cron.schedule("0 5 * * *", async function () {
 			})
 		);
 		let i;
-		for (i = 0; i < data.length; i++) {
+		for (i = 0; i <= data.length; i++) {
 			if (data[i] == undefined) {
 				console.log("undefined");
 			} else if (/^[0-9]*$/.test(data[i]) == false) {
