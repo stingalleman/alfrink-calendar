@@ -1,3 +1,8 @@
+/*
+ * Simple webscraper for https://alfrink.nl/agenda that also generates a iCal feed.
+ * Made by Sting Alleman (https://github.com/stingalleman)
+ */
+
 const puppeteer = require("puppeteer");
 const express = require("express");
 const moment = require("moment");
@@ -66,9 +71,12 @@ function createEvents() {
 		}
 	});
 }
+/*
+ * Scrape https://alfrink.nl/agenda for every month
+ * Cron: run every day at 5 AM
+ */
 
-// Scrape https://alfrink.nl/agenda for every month
-async function init() {
+cron.schedule("0 5 * * *", async function () {
 	try {
 		// Delete all existing stuff in DB (to avoid duplicates)
 		calItem.deleteMany({}, function (err) {
@@ -152,9 +160,7 @@ async function init() {
 		console.log(`FAILURE ON MAIN FUNCTION, EXITING...\n${err}`);
 		process.exit();
 	}
-}
-
-init();
+});
 
 app.get("/", function (req, res) {
 	res.status(404);
