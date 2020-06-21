@@ -5,19 +5,21 @@ const ical = require("ical-generator");
 const cron = require("node-cron");
 const mongoose = require("mongoose");
 
+// Set momentjs locate to NL
 moment.locale("nl");
 
 const app = express();
 
+// Init iCal feed
 const cal = ical({
 	domain: "http://alleman.tech",
 	name: "Alfrink iCal",
 	url: "http://alleman.tech/alfrink",
 	ttl: 60 * 60 * 24,
 	timezone: "Europe/Amsterdam",
-	// events: calEvents,
 });
 
+// Connect to MongoDB
 mongoose
 	.connect("mongodb://192.168.178.150/alfrink-cal", {
 		useNewUrlParser: true,
@@ -25,12 +27,14 @@ mongoose
 	})
 	.then(
 		() => {
-			console.log("connected to mongodb!");
+			console.log("Connected to MongoDB");
 		},
 		(err) => {
-			console.log(`Mongoose error: ${err}`);
+			console.log(`MongoDB connection failure: ${err}`);
 		}
 	);
+
+// Define DB models
 const Schema = mongoose.Schema;
 const calItemSchema = new Schema({
 	start: { type: String, default: "date" },
@@ -46,13 +50,32 @@ const calItemSchema = new Schema({
 });
 const calItem = mongoose.model("calItem", calItemSchema);
 
+function createEvents() {
+	calItem.find({}, function (err, result) {
+		if (err) {
+			console.log(err);
+		} else {
+			result.forEach(function (err, i) {
+				cal.createEvent({
+					start: result[i].start,
+					summary: result[i].summary,
+					location: result[i].location,
+					allDay: result[i].allDay,
+				});
+			});
+		}
+	});
+}
+
+// Scrape https://alfrink.nl/agenda for every month
 async function init() {
 	try {
+		// Delete all existing stuff in DB (to avoid duplicates)
 		calItem.deleteMany({}, function (err) {
 			if (err) {
-				console.log("error deleting db: " + err);
+				console.log("Error deleting existing db: " + err);
 			} else {
-				console.log("deleted!");
+				console.log("Deleted existing entries");
 			}
 		});
 		const browser = await puppeteer.launch({
@@ -62,6 +85,10 @@ async function init() {
 		const page = await browser.newPage();
 		let a;
 		for (a = 1; a <= 12; a++) {
+			// Cycle thru all months
+			console.log(
+				`Scraping month ${a} (https://www.alfrink.nl/agenda?month=${a}&year=${moment().year()})`
+			);
 			await page.goto(
 				`https://www.alfrink.nl/agenda?month=${a}&year=${moment().year()}`,
 				{
@@ -79,7 +106,6 @@ async function init() {
 					if (td.className == "is-disabled") {
 						return;
 					} else {
-						console.log(td);
 						return td.innerText;
 					}
 				})
@@ -87,10 +113,10 @@ async function init() {
 			let i;
 			for (i = 0; i < data.length; i++) {
 				if (data[i] == undefined) {
-					console.log("undefined");
+					continue;
 				} else if (/^[0-9]*$/.test(data[i]) == false) {
 					data[i] = data[i].slice(3);
-					data[i] = data[i].replace(/(\r\n|\n|\r)/gm, " +++ ");
+					data[i] = data[i].replace(/(\r\n|\n|\r)/gm, " ++ ");
 					const event = await new calItem({
 						// prettier-ignore
 						start: `${moment().year(dateData[1]).format("YYYY")}-${moment().month(dateData[0]).format("MM")}-${moment().date(i + 1).format("DD")}T10:10:10`,
@@ -105,49 +131,50 @@ async function init() {
 						},
 					});
 					await event.save();
-					console.log("push!");
 				}
 			}
 		}
 		await browser.close();
+		// Weird invalid date? Just delete it rofl
+		calItem.findOneAndDelete({ "date.day": 30, "date.month": 2 }, function (
+			err,
+			doc
+		) {
+			if (err) {
+				console.log(`Error deleting weird date\n${err}`);
+			} else {
+				console.log(`Deleted weird date\n${doc}!`);
+			}
+		});
+
 		createEvents();
 	} catch (err) {
-		console.log("error: " + err);
+		console.log(`FAILURE ON MAIN FUNCTION, EXITING...\n${err}`);
 		process.exit();
 	}
-}
-
-function createEvents() {
-	calItem.find({}, function (err, result) {
-		if (err) {
-			console.log(err);
-		} else {
-			result.forEach(function (err, i) {
-				let x = i;
-				console.log(x);
-				console.log(result[x].start);
-
-				cal.createEvent({
-					start: result[x].start,
-					summary: result[x].summary,
-					location: result[x].location,
-					allDay: result[x].allDay,
-				});
-			});
-		}
-	});
 }
 
 init();
 
 app.get("/", function (req, res) {
-	res.send("/alfrink of /alfrink/data");
+	res.status(404);
+	res.send(
+		"not found, get outta here! (you're probaly looking for /alfrink or /alfrink/data)"
+	);
 });
 
 app.get("/alfrink", function (req, res) {
 	cal.serve(res);
 });
 
-app.get("/alfrink/data", function (req, res) {});
+app.get("/alfrink/data", function (req, res) {
+	calItem.find({}, function (err, result) {
+		if (err) {
+			console.log(err);
+		} else {
+			res.json(result);
+		}
+	});
+});
 
 app.listen("1223", () => console.log("http://localhost:1223"));
