@@ -60,17 +60,26 @@ function createEvents() {
 		if (err) {
 			console.log(err);
 		} else {
-			result.forEach(function (err, i) {
-				cal.createEvent({
-					start: result[i].start,
-					summary: result[i].summary,
-					location: result[i].location,
-					allDay: result[i].allDay,
+			try {
+				result.forEach(function (err, i) {
+					if (err) {
+						console.log(err);
+					}
+					cal.createEvent({
+						start: result[i].start,
+						summary: result[i].summary,
+						location: result[i].location,
+						allDay: result[i].allDay,
+					});
 				});
-			});
+				console.log("created events!");
+			} catch (err) {
+				console.log(`error trying to make events:\n${err}`);
+			}
 		}
 	});
 }
+
 /*
  * Scrape https://alfrink.nl/agenda for every month
  * Cron: run every day at 5 AM
