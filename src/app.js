@@ -7,8 +7,11 @@ const puppeteer = require("puppeteer");
 const express = require("express");
 const moment = require("moment");
 const ical = require("ical-generator");
+// eslint-disable-next-line no-unused-vars
 const cron = require("node-cron");
 const mongoose = require("mongoose");
+
+const config = require("./config.json");
 
 // Set momentjs locate to NL
 moment.locale("nl");
@@ -26,7 +29,12 @@ const cal = ical({
 
 // Connect to MongoDB
 mongoose
-	.connect("mongodb://192.168.178.150/alfrink-cal", {
+	.connect("mongodb://83.84.118.250/alfrink-cal", {
+		auth: {
+			user: config.db.user,
+			password: config.db.password,
+		},
+		authSource: "admin",
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	})
@@ -76,7 +84,9 @@ function createEvents() {
  * Cron: run every day at 5 AM
  */
 
-cron.schedule("0 5 * * *", async function () {
+// cron.schedule("0 5 * * *", async function () {
+
+async function init() {
 	try {
 		// Delete all existing stuff in DB (to avoid duplicates)
 		calItem.deleteMany({}, function (err) {
@@ -160,8 +170,8 @@ cron.schedule("0 5 * * *", async function () {
 		console.log(`FAILURE ON MAIN FUNCTION, EXITING...\n${err}`);
 		process.exit();
 	}
-});
-
+}
+init();
 app.get("/", function (req, res) {
 	res.status(404);
 	res.send(
@@ -169,7 +179,7 @@ app.get("/", function (req, res) {
 	);
 });
 
-app.get("/alfrink", function (req, res) {
+app.get("/alfrink/:klas", function (req, res) {
 	cal.serve(res);
 });
 
