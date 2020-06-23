@@ -6,26 +6,18 @@
 const puppeteer = require("puppeteer");
 const express = require("express");
 const moment = require("moment");
-const ical = require("ical-generator");
 // eslint-disable-next-line no-unused-vars
 const cron = require("node-cron");
 const mongoose = require("mongoose");
 
+const cal = require("./cal.js");
 const config = require("./config.json");
+const calItemSchema = require("./models/calItem");
 
 // Set momentjs locate to NL
 moment.locale("nl");
 
 const app = express();
-
-// Init iCal feed
-const cal = ical({
-	domain: "http://alleman.tech",
-	name: "Alfrink iCal",
-	url: "http://alleman.tech/alfrink",
-	ttl: 60 * 60 * 24,
-	timezone: "Europe/Amsterdam",
-});
 
 // Connect to MongoDB
 mongoose
@@ -48,37 +40,8 @@ mongoose
 	);
 
 // Define DB models
-const Schema = mongoose.Schema;
-const calItemSchema = new Schema({
-	start: { type: String, default: "date" },
-	summary: { type: String, default: "summary" },
-	location: { type: String, default: "Alfrink College" },
-	allDay: { type: Boolean, default: true },
-	date: {
-		// prettier-ignore
-		day: { type: Number, default: 11 },
-		month: { type: Number, default: 11 },
-		year: { type: Number, default: 1111 },
-	},
-});
 const calItem = mongoose.model("calItem", calItemSchema);
 
-function createEvents() {
-	calItem.find({}, function (err, result) {
-		if (err) {
-			console.log(err);
-		} else {
-			result.forEach(function (err, i) {
-				cal.createEvent({
-					start: result[i].start,
-					summary: result[i].summary,
-					location: result[i].location,
-					allDay: result[i].allDay,
-				});
-			});
-		}
-	});
-}
 /*
  * Scrape https://alfrink.nl/agenda for every month
  * Cron: run every day at 5 AM
@@ -101,60 +64,64 @@ async function init() {
 			args: ["--no-sandbox"],
 		});
 		const page = await browser.newPage();
-		let a;
-		for (a = 1; a <= 12; a++) {
-			// Cycle thru all months
-			console.log(
-				`Scraping month ${a} (https://www.alfrink.nl/agenda?month=${a}&year=${moment().year()})`
-			);
-			await page.goto(
-				`https://www.alfrink.nl/agenda?month=${a}&year=${moment().year()}`,
-				{
-					waitUntil: "networkidle0",
-				}
-			);
-			let dateData = await page.evaluate(() => {
-				// eslint-disable-next-line no-undef
-				const calmonth = document.querySelector(".calendar__month");
-				return calmonth.textContent;
-			});
-			dateData = dateData.split(" - ");
-			const data = await page.$$eval("table tr td", (tds) =>
-				tds.map((td) => {
-					if (td.className == "is-disabled") {
-						return;
-					} else {
-						return td.innerText;
+		let c;
+		for (c = 1; c <= 6; c++) {
+			let a;
+			for (a = 1; a <= 12; a++) {
+				// Cycle thru all months
+				console.log(
+					`Scraping maand ${a}, leerjaar ${c} (https://www.alfrink.nl/agenda?month=${a}&year=${moment().year()}&groep=${c})`
+				);
+				await page.goto(
+					`https://www.alfrink.nl/agenda?month=${a}&year=${moment().year()}&groep=${c}`,
+					{
+						waitUntil: "networkidle0",
 					}
-				})
-			);
-			let i;
-			for (i = 0; i < data.length; i++) {
-				if (data[i] == undefined) {
-					continue;
-				} else if (/^[0-9]*$/.test(data[i]) == false) {
-					data[i] = data[i].slice(3);
-					data[i] = data[i].replace(/(\r\n|\n|\r)/gm, " ++ ");
-					const event = await new calItem({
-						// prettier-ignore
-						start: `${moment().year(dateData[1]).format("YYYY")}-${moment().month(dateData[0]).format("MM")}-${moment().date(i + 1).format("DD")}T10:10:10`,
-						summary: data[i],
-						location: "Alfrink College",
-						allDay: true,
-						date: {
+				);
+				let dateData = await page.evaluate(() => {
+					// eslint-disable-next-line no-undef
+					const calmonth = document.querySelector(".calendar__month");
+					return calmonth.textContent;
+				});
+				dateData = dateData.split(" - ");
+				const data = await page.$$eval("table tr td", (tds) =>
+					tds.map((td) => {
+						if (td.className == "is-disabled") {
+							return;
+						} else {
+							return td.innerText;
+						}
+					})
+				);
+				let i;
+				for (i = 0; i < data.length; i++) {
+					if (data[i] == undefined) {
+						continue;
+					} else if (/^[0-9]*$/.test(data[i]) == false) {
+						data[i] = data[i].slice(3);
+						data[i] = data[i].replace(/(\r\n|\n|\r)/gm, " ++ ");
+						const event = await new calItem({
+							grade: c,
 							// prettier-ignore
-							day: moment().date(i + 1).format("DD"),
-							month: moment().month(dateData[0]).format("MM"),
-							year: moment().year(dateData[1]).format("YYYY"),
-						},
-					});
-					await event.save();
+							start: `${moment().year(dateData[1]).format("YYYY")}-${moment().month(dateData[0]).format("MM")}-${moment().date(i + 1).format("DD")}T10:10:10`,
+							summary: data[i],
+							location: "Alfrink College",
+							allDay: true,
+							date: {
+								// prettier-ignore
+								day: moment().date(i + 1).format("DD"),
+								month: moment().month(dateData[0]).format("MM"),
+								year: moment().year(dateData[1]).format("YYYY"),
+							},
+						});
+						await event.save();
+					}
 				}
 			}
 		}
 		await browser.close();
 		// Weird invalid date? Just delete it rofl
-		calItem.findOneAndDelete({ "date.day": 30, "date.month": 2 }, function (
+		calItem.findOneAndRemove({ "date.day": 30, "date.month": 2 }, function (
 			err,
 			doc
 		) {
@@ -164,14 +131,14 @@ async function init() {
 				console.log(`Deleted weird date\n${doc}!`);
 			}
 		});
-
-		createEvents();
 	} catch (err) {
 		console.log(`FAILURE ON MAIN FUNCTION, EXITING...\n${err}`);
 		process.exit();
 	}
 }
-init();
+
+// init();
+
 app.get("/", function (req, res) {
 	res.status(404);
 	res.send(
@@ -180,17 +147,31 @@ app.get("/", function (req, res) {
 });
 
 app.get("/alfrink/:klas", function (req, res) {
-	cal.serve(res);
+	if (req.params.klas == 0) {
+		res.send(cal.cal0.serve);
+	}
 });
 
-app.get("/alfrink/data", function (req, res) {
-	calItem.find({}, function (err, result) {
-		if (err) {
-			console.log(err);
-		} else {
-			res.json(result);
-		}
-	});
+app.get("/alfrink/data/:klas", function (req, res) {
+	if (req.params.klas == 0) {
+		calItem.find({}, function (err, result) {
+			if (err) {
+				console.log(err);
+				res.send(err);
+			} else {
+				res.json(result);
+			}
+		});
+	} else {
+		calItem.find({ grade: req.params.klas }, function (err, result) {
+			if (err) {
+				console.log(err);
+				res.send(err);
+			} else {
+				res.json(result);
+			}
+		});
+	}
 });
 
 app.listen("1223", () => console.log("http://localhost:1223"));
