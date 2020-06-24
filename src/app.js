@@ -283,4 +283,4 @@ app.get("/alfrink/data/:klas", function (req, res) {
 	// }
 });
 
-app.listen(process.env.PORT, () => console.log("http://localhost:1223"));
+app.listen("80", () => console.log("http://localhost:1223"));

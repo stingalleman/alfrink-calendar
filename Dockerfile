@@ -5,8 +5,6 @@ ENV DB_USER root
 ENV DB_PASS password
 ENV DB_AUTHSOURCE admin
 
-ENV PORT 1334
-
 RUN apt-get update
 
 # for https
@@ -25,6 +23,6 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-EXPOSE 1223
+EXPOSE 80
 
 CMD [ "npm", "start" ]
