@@ -95,7 +95,7 @@ const calItem = mongoose.model("calItem", calItemSchema);
  * Cron: run every day at 5 AM (0 5 * * *)
  */
 
-cron.schedule("0 5 * * *", async function () {
+async function main() {
 	try {
 		// Delete all existing stuff in DB (to avoid duplicates)
 		calItem.deleteMany({}, function (err) {
@@ -242,6 +242,8 @@ function createEvents() {
 		});
 	}
 }
+
+main();
 
 app.get("/", function (req, res) {
 	res.status(404);
