@@ -248,11 +248,14 @@ main();
 app.get("/", function (req, res) {
 	res.status(404);
 	res.send(
-		"404, get outta here!\nJe zoekt waarschijnelijk https://cal.alleman.tech/alfrink/leerjaar.\nLeerjaar kan 1 t/m 6 zijn, of alles"
+		"404, get outta here!\nJe zoekt waarschijnlijk https://cal.alleman.tech/alfrink/leerjaar.\nLeerjaar kan 1 t/m 6 zijn, of alles"
 	);
 });
 
 app.get("/alfrink/:klas", function (req, res) {
+	console.log(
+		`request to /alfrink/${req.params.klas}\nfrom IP: ${req.ip}\nHeaders: ${req.headers}`
+	);
 	if (req.params.klas == "alles") {
 		cal0.serve(res);
 	} else if (req.params.klas == 0) {
@@ -274,7 +277,9 @@ app.get("/alfrink/:klas", function (req, res) {
 
 app.get("/alfrink/data/:klas", function (req, res) {
 	calItem.find({ grade: req.params.klas }, function (err, result) {
-		console.log(`Request to /alfrink/data/${req.params.klas}`);
+		console.log(
+			`Request to /alfrink/data/${req.params.klas}\nIP: ${req.ip}\nHeaders: ${req.headers}`
+		);
 		if (err) {
 			console.log(err);
 			res.send(err);
