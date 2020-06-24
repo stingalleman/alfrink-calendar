@@ -168,17 +168,6 @@ async function main() {
 		}
 		await browser.close();
 		console.timeEnd("scrape");
-		// Weird invalid date? Just delete it rofl
-		await calItem.deleteMany({ "date.day": 30, "date.month": 2 }, function (
-			err,
-			doc
-		) {
-			if (err) {
-				console.log(`Error deleting weird date\n${err}`);
-			} else {
-				console.log(`Deleted weird dates!\n${JSON.stringify(doc)}`);
-			}
-		});
 		createEvents();
 	} catch (err) {
 		console.log(`FAILURE ON SCRAPER FUNCTION, EXITING...\n${err}`);
