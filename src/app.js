@@ -6,7 +6,6 @@
 const puppeteer = require("puppeteer");
 const express = require("express");
 const moment = require("moment");
-const cron = require("node-cron");
 const mongoose = require("mongoose");
 
 const ical = require("ical-generator");
@@ -181,7 +180,7 @@ async function main() {
 		console.log(`FAILURE ON SCRAPER FUNCTION, EXITING...\n${err}`);
 		process.exit();
 	}
-});
+}
 
 function createEvents() {
 	let c;
@@ -285,8 +284,19 @@ app.get("/alfrink/data/:klas", function (req, res) {
 	// }
 });
 
-app.get("/alfrink/run", function (req, res) {
-	main();
-})
+app.get("/alfrink/run/:token", function (req, res) {
+	if (req.params.token == process.env.RUNTOKEN) {
+		main();
+		res.json({
+			successful: true,
+			desc: "running main function",
+		});
+	} else {
+		res.json({
+			successful: false,
+			desc: "invalid token",
+		});
+	}
+});
 
 app.listen("80", () => console.log("http://localhost:1223"));
