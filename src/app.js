@@ -107,7 +107,6 @@ cron.schedule("48 17 * * *", async function () {
 		});
 		const browser = await puppeteer.launch({
 			headless: true,
-			args: ["--no-sandbox"],
 		});
 		const page = await browser.newPage();
 		let c;
