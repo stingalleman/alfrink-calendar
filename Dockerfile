@@ -4,6 +4,7 @@ ENV DB_HOST localhost
 ENV DB_USER root
 ENV DB_PASS password
 ENV DB_AUTHSOURCE admin
+ENV RUNTOKEN password
 
 RUN apt-get update
 
