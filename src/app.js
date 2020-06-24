@@ -285,4 +285,8 @@ app.get("/alfrink/data/:klas", function (req, res) {
 	// }
 });
 
+app.get("/alfrink/run", function (req, res) {
+	main();
+})
+
 app.listen("80", () => console.log("http://localhost:1223"));
