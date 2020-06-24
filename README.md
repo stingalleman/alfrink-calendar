@@ -2,6 +2,13 @@
 
 Webscraper for the [Alfrink calendar](https://www.alfrink.nl/agenda)
 
+## Run using docker
+
+```bash
+docker build -t (USER)/alfrink-calendar .
+docker run -p 80:80 -e DB_HOST=(HOST) -e DB_USER=(USER) -e DB_PASS=(PASS) -d (USER)/alfrink-calendar
+```
+
 ## Contributing
 
 ```bash
