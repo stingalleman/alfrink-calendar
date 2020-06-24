@@ -96,6 +96,7 @@ const calItem = mongoose.model("calItem", calItemSchema);
 
 async function main() {
 	try {
+		console.time("scrape");
 		// Delete all existing stuff in DB (to avoid duplicates)
 		calItem.deleteMany({}, function (err) {
 			if (err) {
@@ -143,18 +144,19 @@ async function main() {
 					if (data[i] == undefined) {
 						continue;
 					} else if (/^[0-9]*$/.test(data[i]) == false) {
+						const day = data[i].substring(0, 2);
 						data[i] = data[i].slice(3);
 						data[i] = data[i].replace(/(\r\n|\n|\r)/gm, " ++ ");
 						const event = await new calItem({
 							grade: c,
 							// prettier-ignore
-							start: `${moment().year(dateData[1]).format("YYYY")}-${moment().month(dateData[0]).format("MM")}-${moment().date(i + 1).format("DD")}T10:10:10`,
+							start: `${moment().year(dateData[1]).format("YYYY")}-${moment().month(dateData[0]).format("MM")}-${moment().date(day).format("DD")}T10:10:10`,
 							summary: data[i],
 							location: "Alfrink College",
 							allDay: true,
 							date: {
 								// prettier-ignore
-								day: moment().date(i + 1).format("DD"),
+								day: moment().date(day).format("DD"),
 								month: moment().month(dateData[0]).format("MM"),
 								year: moment().year(dateData[1]).format("YYYY"),
 							},
@@ -165,6 +167,7 @@ async function main() {
 			}
 		}
 		await browser.close();
+		console.timeEnd("scrape");
 		// Weird invalid date? Just delete it rofl
 		await calItem.deleteMany({ "date.day": 30, "date.month": 2 }, function (
 			err,
