@@ -1,17 +1,15 @@
 /*
- * Simple webscraper for https://alfrink.nl/agenda that also generates a iCal feed.
+ * Simple webscraper for https://alfrink.nl/agenda that also generates a iCal feed, one for every grade.
  * Made by Sting Alleman (https://github.com/stingalleman)
  */
 
 const puppeteer = require("puppeteer");
 const express = require("express");
 const moment = require("moment");
-// eslint-disable-next-line no-unused-vars
 const cron = require("node-cron");
 const mongoose = require("mongoose");
 
-const cal = require("./cal.js");
-const config = require("./config.json");
+const ical = require("ical-generator");
 const calItemSchema = require("./models/calItem");
 
 // Set momentjs locate to NL
@@ -19,9 +17,60 @@ moment.locale("nl");
 
 const app = express();
 
+// Define all the iCal's
+const cal0 = ical({
+	domain: "http://alleman.tech",
+	name: "Alfrink iCal (Alles)",
+	url: "http://alleman.tech/alfrink/0",
+	ttl: 60 * 60 * 24,
+	timezone: "Europe/Amsterdam",
+});
+const cal1 = ical({
+	domain: "http://alleman.tech",
+	name: "Alfrink iCal (Leerjaar 1)",
+	url: "http://alleman.tech/alfrink/1",
+	ttl: 60 * 60 * 24,
+	timezone: "Europe/Amsterdam",
+});
+const cal2 = ical({
+	domain: "http://alleman.tech",
+	name: "Alfrink iCal (Leerjaar 2)",
+	url: "http://alleman.tech/alfrink/2",
+	ttl: 60 * 60 * 24,
+	timezone: "Europe/Amsterdam",
+});
+const cal3 = ical({
+	domain: "http://alleman.tech",
+	name: "Alfrink iCal (Leerjaar 3)",
+	url: "http://alleman.tech/alfrink/3",
+	ttl: 60 * 60 * 24,
+	timezone: "Europe/Amsterdam",
+});
+const cal4 = ical({
+	domain: "http://alleman.tech",
+	name: "Alfrink iCal (Leerjaar 4)",
+	url: "http://alleman.tech/alfrink/4",
+	ttl: 60 * 60 * 24,
+	timezone: "Europe/Amsterdam",
+});
+const cal5 = ical({
+	domain: "http://alleman.tech",
+	name: "Alfrink iCal (Leerjaar 5)",
+	url: "http://alleman.tech/alfrink/5",
+	ttl: 60 * 60 * 24,
+	timezone: "Europe/Amsterdam",
+});
+const cal6 = ical({
+	domain: "http://alleman.tech",
+	name: "Alfrink iCal (Leerjaar 6)",
+	url: "http://alleman.tech/alfrink/6",
+	ttl: 60 * 60 * 24,
+	timezone: "Europe/Amsterdam",
+});
+
 // Connect to MongoDB
 mongoose
-	.connect("mongodb://83.84.118.250/alfrink-cal", {
+	.connect("mongodb://192.168.178.150/alfrink-cal", {
 		auth: {
 			user: config.db.user,
 			password: config.db.password,
@@ -43,11 +92,10 @@ mongoose
 const calItem = mongoose.model("calItem", calItemSchema);
 
 /*
- * Scrape https://alfrink.nl/agenda for every month
- * Cron: run every day at 5 AM
+ * Cron: run every day at 5 AM (0 5 * * *)
  */
 
-// cron.schedule("0 5 * * *", async function () {
+// cron.schedule("48 17 * * *", async function () {
 
 async function init() {
 	try {
@@ -65,7 +113,7 @@ async function init() {
 		});
 		const page = await browser.newPage();
 		let c;
-		for (c = 1; c <= 6; c++) {
+		for (c = 0; c <= 6; c++) {
 			let a;
 			for (a = 1; a <= 12; a++) {
 				// Cycle thru all months
@@ -121,57 +169,123 @@ async function init() {
 		}
 		await browser.close();
 		// Weird invalid date? Just delete it rofl
-		calItem.findOneAndRemove({ "date.day": 30, "date.month": 2 }, function (
+		await calItem.deleteMany({ "date.day": 30, "date.month": 2 }, function (
 			err,
 			doc
 		) {
 			if (err) {
 				console.log(`Error deleting weird date\n${err}`);
 			} else {
-				console.log(`Deleted weird date\n${doc}!`);
+				console.log(`Deleted weird dates!\n${JSON.stringify(doc)}`);
 			}
 		});
+		createEvents();
 	} catch (err) {
-		console.log(`FAILURE ON MAIN FUNCTION, EXITING...\n${err}`);
+		console.log(`FAILURE ON SCRAPER FUNCTION, EXITING...\n${err}`);
 		process.exit();
 	}
 }
 
-// init();
+init();
+
+function createEvents() {
+	let c;
+	for (c = 0; c <= 6; c++) {
+		calItem.find({ grade: c }, function (err, result) {
+			result.forEach(function (err, i) {
+				if (result[i].grade == 0) {
+					cal0.createEvent({
+						start: result[i].start,
+						summary: result[i].summary,
+						location: result[i].location,
+						allDay: result[i].allDay,
+					});
+				} else if (result[i].grade == 1) {
+					cal1.createEvent({
+						start: result[i].start,
+						summary: result[i].summary,
+						location: result[i].location,
+						allDay: result[i].allDay,
+					});
+				} else if (result[i].grade == 2) {
+					cal2.createEvent({
+						start: result[i].start,
+						summary: result[i].summary,
+						location: result[i].location,
+						allDay: result[i].allDay,
+					});
+				} else if (result[i].grade == 3) {
+					cal3.createEvent({
+						start: result[i].start,
+						summary: result[i].summary,
+						location: result[i].location,
+						allDay: result[i].allDay,
+					});
+				} else if (result[i].grade == 4) {
+					cal4.createEvent({
+						start: result[i].start,
+						summary: result[i].summary,
+						location: result[i].location,
+						allDay: result[i].allDay,
+					});
+				} else if (result[i].grade == 5) {
+					cal5.createEvent({
+						start: result[i].start,
+						summary: result[i].summary,
+						location: result[i].location,
+						allDay: result[i].allDay,
+					});
+				} else if (result[i].grade == 6) {
+					cal6.createEvent({
+						start: result[i].start,
+						summary: result[i].summary,
+						location: result[i].location,
+						allDay: result[i].allDay,
+					});
+				}
+			});
+		});
+	}
+}
 
 app.get("/", function (req, res) {
 	res.status(404);
 	res.send(
-		"not found, get outta here! (you're probaly looking for /alfrink or /alfrink/data)"
+		"404, get outta here!\nJe zoekt waarschijnelijk https://cal.alleman.tech/alfrink/leerjaar.\nLeerjaar kan 1 t/m 6 zijn, of alles"
 	);
 });
 
 app.get("/alfrink/:klas", function (req, res) {
-	if (req.params.klas == 0) {
-		res.send(cal.cal0.serve);
+	if (req.params.klas == "alles") {
+		cal0.serve(res);
+	} else if (req.params.klas == 0) {
+		cal0.serve(res);
+	} else if (req.params.klas == 1) {
+		cal1.serve(res);
+	} else if (req.params.klas == 2) {
+		cal2.serve(res);
+	} else if (req.params.klas == 3) {
+		cal3.serve(res);
+	} else if (req.params.klas == 4) {
+		cal4.serve(res);
+	} else if (req.params.klas == 5) {
+		cal5.serve(res);
+	} else if (req.params.klas == 6) {
+		cal6.serve(res);
 	}
 });
 
 app.get("/alfrink/data/:klas", function (req, res) {
-	if (req.params.klas == 0) {
-		calItem.find({}, function (err, result) {
-			if (err) {
-				console.log(err);
-				res.send(err);
-			} else {
-				res.json(result);
-			}
-		});
-	} else {
-		calItem.find({ grade: req.params.klas }, function (err, result) {
-			if (err) {
-				console.log(err);
-				res.send(err);
-			} else {
-				res.json(result);
-			}
-		});
-	}
+	calItem.find({ grade: req.params.klas }, function (err, result) {
+		console.log(`Request to /alfrink/data/${req.params.klas}`);
+		if (err) {
+			console.log(err);
+			res.send(err);
+		} else {
+			res.json(result);
+		}
+	});
+	// }
 });
 
 app.listen("1223", () => console.log("http://localhost:1223"));
