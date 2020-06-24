@@ -4,7 +4,7 @@
 	"description": "Webscraper for https://www.alfrink.nl/agenda",
 	"main": "app.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"start": "node src/app.js"
 	},
 	"repository": {
 		"type": "git",
