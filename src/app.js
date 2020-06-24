@@ -70,12 +70,12 @@ const cal6 = ical({
 
 // Connect to MongoDB
 mongoose
-	.connect("mongodb://192.168.178.150/alfrink-cal", {
+	.connect(`mongodb://${process.env.DB_HOST}/alfrink-cal`, {
 		auth: {
-			user: config.db.user,
-			password: config.db.password,
+			user: process.env.DB_USER,
+			password: process.env.DB_PASS,
 		},
-		authSource: "admin",
+		authSource: process.env.DB_AUTHSOURCE,
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	})
@@ -288,4 +288,4 @@ app.get("/alfrink/data/:klas", function (req, res) {
 	// }
 });
 
-app.listen("1223", () => console.log("http://localhost:1223"));
+app.listen(process.env.PORT, () => console.log("http://localhost:1223"));
