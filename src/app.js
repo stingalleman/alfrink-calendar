@@ -95,9 +95,7 @@ const calItem = mongoose.model("calItem", calItemSchema);
  * Cron: run every day at 5 AM (0 5 * * *)
  */
 
-// cron.schedule("48 17 * * *", async function () {
-
-async function init() {
+cron.schedule("48 17 * * *", async function () {
 	try {
 		// Delete all existing stuff in DB (to avoid duplicates)
 		calItem.deleteMany({}, function (err) {
@@ -184,9 +182,7 @@ async function init() {
 		console.log(`FAILURE ON SCRAPER FUNCTION, EXITING...\n${err}`);
 		process.exit();
 	}
-}
-
-init();
+});
 
 function createEvents() {
 	let c;
