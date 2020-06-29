@@ -97,14 +97,6 @@ const calItem = mongoose.model("calItem", calItemSchema);
 async function main() {
 	try {
 		console.time("scrape");
-		// Delete all existing stuff in DB (to avoid duplicates)
-		calItem.deleteMany({}, function (err) {
-			if (err) {
-				console.log("Error deleting existing db: " + err);
-			} else {
-				console.log("Deleted existing entries");
-			}
-		});
 		const browser = await puppeteer.launch({
 			headless: true,
 			args: ["--no-sandbox"],
@@ -176,6 +168,13 @@ async function main() {
 }
 
 function createEvents() {
+	cal0.clear();
+	cal1.clear();
+	cal2.clear();
+	cal3.clear();
+	cal4.clear();
+	cal5.clear();
+	cal6.clear();
 	let c;
 	for (c = 0; c <= 6; c++) {
 		calItem.find({ grade: c }, function (err, result) {
