@@ -1,13 +1,21 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS",
+    "target": "ES2018",
+    "module": "commonjs",
     "outDir": "dist",
-    "resolveJsonModule": true,
-    "watch": true,
-    "rootDir": "src"
+    "rootDir": "src",
+    "baseUrl": "./",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true,
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
 }
