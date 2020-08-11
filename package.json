@@ -26,12 +26,18 @@
 		"express": "^4.17.1",
 		"ical-generator": "^1.11.0",
 		"moment": "^2.27.0",
-		"mongoose": "^5.9.19",
-		"puppeteer": "^2.1.1"
+		"puppeteer": "^2.1.1",
+		"dotenv": "^8.2.0",
+    "pg": "^8.3.0",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.25"
 	},
 	"devDependencies": {
 		"eslint": "^7.0.0",
 		"eslint-plugin-prettier": "^3.1.3",
-		"prettier": "^2.0.5"
+		"prettier": "^2.0.5",
+		"@typescript-eslint/eslint-plugin": "^3.0.0",
+		"@typescript-eslint/parser": "^3.0.0",
+		"typescript": "^3.9.3"
 	}
 }
