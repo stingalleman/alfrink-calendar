@@ -6,7 +6,7 @@ dotenv.config();
 import database from "./core/database";
 import app from "./core/app";
 import scraper from "./core/scraper";
-import { GenerateEvents } from "./iCals";
+import { GenerateEvents } from "./cals";
 
 const bootstrap = async (): Promise<void> => {
 	try {

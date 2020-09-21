@@ -7,7 +7,7 @@ import express from "express";
 
 import scraper from "./scraper";
 import { CalItem } from "../entities/calItem";
-import { cal0, GenerateEvents } from "../iCals";
+import { cal0, GenerateEvents } from "../cals";
 
 const app = express();
 
