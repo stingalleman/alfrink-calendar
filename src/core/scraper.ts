@@ -7,7 +7,7 @@ export default async (): Promise<void> => {
 	try {
 		console.time("scrape");
 		const browser = await puppeteer.launch({
-			headless: true,
+			headless: false,
 			args: ["--no-sandbox"],
 		});
 		const page = await browser.newPage();
@@ -62,18 +62,17 @@ export default async (): Promise<void> => {
 								.update(JSON.stringify(data[i]))
 								.digest("base64")}`
 						);
-						console.log(data[i]);
-						await CalItem.create({
-							id: `_${c}_${i}_${a}_${createHash("sha1")
-								.update(JSON.stringify(data[i]))
-								.digest("base64")}`,
-							grade: c,
-							start: start,
-							summary: data[i],
-							location: "Alfrink College",
-							allDay: true,
-						}).save();
-						console.log("saved!");
+						// await CalItem.create({
+						// 	id: `_${c}_${i}_${a}_${createHash("sha1")
+						// 		.update(JSON.stringify(data[i]))
+						// 		.digest("base64")}`,
+						// 	grade: c,
+						// 	start: start,
+						// 	summary: data[i],
+						// 	location: "Alfrink College",
+						// 	allDay: true,
+						// }).save();
+						// console.log("saved!");
 					}
 				}
 			}
@@ -82,6 +81,6 @@ export default async (): Promise<void> => {
 		console.timeEnd("scrape");
 	} catch (err) {
 		console.log(`FAILURE ON SCRAPER FUNCTION, EXITING...\n${err}`);
-		process.exit();
+		// process.exit();
 	}
 };

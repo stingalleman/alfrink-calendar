@@ -3,21 +3,20 @@ import "reflect-metadata";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-const args = process.argv.slice(2);
-
 import database from "./core/database";
 import app from "./core/app";
 import scraper from "./core/scraper";
+import { GenerateEvents } from "./iCals";
 
 const bootstrap = async (): Promise<void> => {
-	await database();
-	await app();
-
-	//
-	// Cron: run every day at 5 AM (0 5 * * *)
-	//
-
-	if (args[0] === "scrape") await scraper();
+	try {
+		await database();
+		if (process.argv.slice(2)[0] === "scrape") await scraper();
+		await app();
+		await GenerateEvents();
+	} catch (err) {
+		console.log(`[BOOTSTRAP] FATAL ERROR: ${err}`);
+	}
 };
 
 bootstrap();

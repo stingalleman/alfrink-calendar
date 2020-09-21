@@ -9,7 +9,7 @@ export class CalItem extends BaseEntity {
 	grade: number;
 
 	@Column("text")
-	start: string;
+	start: moment.Moment;
 
 	@Column("text")
 	summary: string;
