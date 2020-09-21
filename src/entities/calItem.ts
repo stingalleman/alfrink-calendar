@@ -2,8 +2,8 @@ import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class CalItem extends BaseEntity {
-	@PrimaryColumn("int")
-	id: number;
+	@PrimaryColumn("text")
+	id: string;
 
 	@Column("int")
 	grade: number;

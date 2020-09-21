@@ -1,8 +1,11 @@
-import { Connection, createConnection } from "typeorm";
+import { CalItem } from "../entities/calItem";
 import { TypeormEntities } from "../entities";
+import * as orm from "typeorm";
 
-export default async (): Promise<Connection> => {
-	const db = await createConnection({
+const arg = process.argv.slice(2);
+
+async function initDB() {
+	const db = await orm.createConnection({
 		type: "postgres",
 		host: process.env.DB_HOST,
 		port: (process.env.DB_PORT as unknown) as number,
@@ -15,4 +18,12 @@ export default async (): Promise<Connection> => {
 	});
 	console.info("[DATABASE] Connected");
 	return db;
-};
+}
+
+initDB();
+
+if (arg[0] === "DROP") {
+	console.log("dropping CalItem DB");
+} else {
+	console.log("nothing to do!");
+}

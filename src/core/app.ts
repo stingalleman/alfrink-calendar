@@ -222,11 +222,19 @@ const app = express();
 
 export default async (): Promise<void> => {
 	app.get("/alfrink/data/:grade", async (req, res) => {
-		res.json(await CalItem.find({ where: { grade: req.params.grade } })).end();
+		res.json(
+			await CalItem.find({ where: { grade: req.params.grade }, cache: false })
+		);
 	});
 
-	app.get("/test", async (req, res) => {
-		res.send("hi " + (await CalItem.find()).length);
+	app.get("/alfrink/data", async (req, res) => {
+		res.json(await CalItem.find());
+	});
+
+	app.get("/alfrink/length", async (req, res) => {
+		res.json({
+			length: (await CalItem.find()).length,
+		});
 	});
 
 	app.listen(process.env.WEBPORT || 3000, () =>

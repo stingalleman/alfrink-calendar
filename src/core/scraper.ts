@@ -1,6 +1,7 @@
 import puppeteer from "puppeteer";
 import moment from "moment";
 import { CalItem } from "../entities/calItem";
+import { createHash } from "crypto";
 
 export default async (): Promise<void> => {
 	try {
@@ -10,9 +11,9 @@ export default async (): Promise<void> => {
 			args: ["--no-sandbox"],
 		});
 		const page = await browser.newPage();
-		let c;
+		let c: number;
 		for (c = 0; c <= 6; c++) {
-			let a;
+			let a: number;
 			for (a = 1; a <= 12; a++) {
 				// Cycle thru all months
 				console.log(
@@ -41,9 +42,11 @@ export default async (): Promise<void> => {
 				);
 				let i: number;
 				for (i = 0; i < data.length; i++) {
+					if (data[i] === "Start wendagen klas 1") console.log(data[i]);
 					if (data[i] == undefined) {
 						continue;
 					} else if (!/^[0-9]*$/.test(data[i])) {
+						// console.log(data[i]);
 						const day = data[i].substring(0, 2);
 						data[i] = data[i].slice(3);
 						data[i] = data[i].replace(/(\r\n|\n|\r)/gm, " ++ ");
@@ -54,8 +57,16 @@ export default async (): Promise<void> => {
 							.format("MM")}-${moment()
 							.date(parseInt(day))
 							.format("DD")}T10:10:10`;
+						console.log(
+							`_${c}_${i}_${a}_${createHash("sha1")
+								.update(JSON.stringify(data[i]))
+								.digest("base64")}`
+						);
+						console.log(data[i]);
 						await CalItem.create({
-							id: parseInt(`${a}${i}`),
+							id: `_${c}_${i}_${a}_${createHash("sha1")
+								.update(JSON.stringify(data[i]))
+								.digest("base64")}`,
 							grade: c,
 							start: start,
 							summary: data[i],
