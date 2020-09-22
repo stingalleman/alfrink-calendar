@@ -5,6 +5,11 @@ const cal4 = ical({
 	domain: "cal.alleman.tech",
 	name: "Alfrink Agenda (Leerjaar 4)",
 	ttl: 60 * 60 * 24,
+	prodId: {
+		company: "Sting Alleman",
+		product: "Alfrink iCal Feed",
+		language: "NL",
+	},
 });
 
 export async function GenerateCal4(): Promise<ical.ICalCalendar> {
