@@ -11,8 +11,8 @@ import { GenerateEvents } from "./cals";
 const bootstrap = async (): Promise<void> => {
 	try {
 		await database();
-		if (process.argv.slice(2)[0] === "scrape") await scraper();
 		await app();
+		if (process.argv.slice(2)[0] === "scrape") await scraper();
 		await GenerateEvents();
 	} catch (err) {
 		console.log(`[BOOTSTRAP] FATAL ERROR: ${err}`);

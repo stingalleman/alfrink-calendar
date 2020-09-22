@@ -3,7 +3,8 @@ import { CalItem } from "../entities/calItem";
 
 const cal6 = ical({
 	domain: "cal.alleman.tech",
-	name: "Alfrink (Grade 6)",
+	name: "Alfrink Agenda (Leerjaar 6)",
+	ttl: 60 * 60 * 24,
 });
 
 export async function GenerateCal6(): Promise<ical.ICalCalendar> {
