@@ -1,10 +1,11 @@
 FROM node:latest
 
 ENV DB_HOST localhost
-ENV DB_USER root
-ENV DB_PASS password
-ENV DB_AUTHSOURCE admin
-ENV RUNTOKEN password
+ENV DB_PORT 5432
+ENV DB_USERNAME root
+ENV DB_PASSWORD DB_PASSWORD
+
+ENV DEBUG_TOKEN password
 
 RUN apt-get update
 
@@ -18,6 +19,6 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-EXPOSE 80
+EXPOSE 3000
 
 CMD [ "npm", "start" ]

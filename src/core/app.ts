@@ -94,7 +94,5 @@ export default async (): Promise<void> => {
 		else res.json(cal.cal0.toJSON());
 	});
 
-	app.listen(process.env.WEBPORT || 3000, () =>
-		console.log(`listening on http://localhost:${process.env.WEBPORT || 3000}`)
-	);
+	app.listen(3000, () => console.log("listening on http://localhost:3000}"));
 };
