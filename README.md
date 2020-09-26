@@ -5,8 +5,8 @@ Webscraper for the [Alfrink calendar](https://www.alfrink.nl/agenda)
 ## Run using docker
 
 ```bash
-docker build -t (USER)/alfrink-calendar .
-docker run -p 80:80 -e DB_HOST=(HOST) -e DB_USER=(USER) -e DB_PASS=(PASS) -d (USER)/alfrink-calendar
+docker build -t alfrink-calendar .
+docker run -p 8592:3000 --name alfrink-cal -e "DEBUG_TOKEN=XXX" -e "DB_HOST=XXX" -e "DB_DATABASE=XXX" -e "DB_USERNAME=XXXX" -e "DB_PASSWORD=XXX" -d alfrink-calendar
 ```
 
 ## Contributing
@@ -14,9 +14,10 @@ docker run -p 80:80 -e DB_HOST=(HOST) -e DB_USER=(USER) -e DB_PASS=(PASS) -d (US
 ```bash
 git clone https://github.com/stingalleman/alfrink-calendar
 cd alfrink-calendar
-npm install
+yarn install
 
-node src/index.js # Run the code
+tsc . # compile typescript
+node dist/index.js # Run the code
 ```
 
 _____
