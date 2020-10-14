@@ -25,14 +25,10 @@ export default async (): Promise<void> => {
 	});
 
 	app.get("/alfrink/cal/:grade", async (req, res) => {
-		if (req.params.grade === "0") cal.cal0.serve(res);
-		else if (req.params.grade === "1") cal.cal1.serve(res);
-		else if (req.params.grade === "2") cal.cal2.serve(res);
-		else if (req.params.grade === "3") cal.cal3.serve(res);
-		else if (req.params.grade === "4") cal.cal4.serve(res);
-		else if (req.params.grade === "5") cal.cal5.serve(res);
-		else if (req.params.grade === "6") cal.cal6.serve(res);
-		else cal.cal0.serve(res);
+		const grade: number = req.params.grade.parseInt();
+		if (grade < 0 || >6) grade = 0;
+
+		cal[`cal${req.params.grade}`].serve(res);
 	});
 
 	app.get("/alfrink/data/:grade", async (req, res) => {
@@ -65,13 +61,11 @@ export default async (): Promise<void> => {
 		if (req.query.token !== process.env.DEBUG_TOKEN) {
 			return res.send("nice try");
 		}
-		cal.cal0.clear();
-		cal.cal1.clear();
-		cal.cal2.clear();
-		cal.cal3.clear();
-		cal.cal4.clear();
-		cal.cal5.clear();
-		cal.cal6.clear();
+		
+		for(let i: number; i < 7; i++) {
+			cal[`cal${i}`].clear();
+		}
+		
 		res.send("cleared all cal's");
 	});
 	app.get("/debug/generate", async (req, res) => {
@@ -84,14 +78,11 @@ export default async (): Promise<void> => {
 		if (req.query.token !== process.env.DEBUG_TOKEN) {
 			return res.send("nice try");
 		}
-		if (req.params.grade === "0") res.json(cal.cal0.toJSON());
-		else if (req.params.grade === "1") res.json(cal.cal1.toJSON());
-		else if (req.params.grade === "2") res.json(cal.cal2.toJSON());
-		else if (req.params.grade === "3") res.json(cal.cal3.toJSON());
-		else if (req.params.grade === "4") res.json(cal.cal4.toJSON());
-		else if (req.params.grade === "5") res.json(cal.cal5.toJSON());
-		else if (req.params.grade === "6") res.json(cal.cal6.toJSON());
-		else res.json(cal.cal0.toJSON());
+		
+		const grade: number = req.params.grade.parseInt();
+		if (grade < 0 || >6) grade = 0;
+
+		res.json(cal[`cal${req.params.grade}`].toJSON());
 	});
 
 	app.listen(3000, () => console.log("listening on http://localhost:3000}"));
