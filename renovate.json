@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "labels": ["dependencies"],
+  "major": {
+    "labels": ["major"]
+  },
+  "minor": {
+    "labels": ["minor"]
+  },
+  "pin": {
+    "labels": ["pin"]
+  }
+}
