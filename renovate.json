@@ -4,12 +4,12 @@
   ],
   "labels": ["dependencies"],
   "major": {
-    "labels": ["major"]
+    "labels": ["major", "dependencies"]
   },
   "minor": {
-    "labels": ["minor"]
+    "labels": ["minor", "dependencies"]
   },
   "pin": {
-    "labels": ["pin"]
+    "labels": ["pin", "dependencies"]
   }
 }
